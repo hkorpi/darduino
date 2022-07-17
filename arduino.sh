@@ -8,13 +8,12 @@ docker run \
     -it \
     --rm \
     --network=host \
-    --privileged \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
-    -v /dev:/dev \
-    -v $HOME/topics:/topics \
-    -v $HOME/topics/arduino:/home/developer/Arduino \
+    --device=/dev/ttyACM1 \
+    -v $HOME/research/arduino:/home/developer/Arduino \
+    -v $HOME/.arduino15:/home/developer/.arduino15 \
     --name arduino \
-    tombenke/darduino:v1.8.5 \
+    hkorpi/darduino \
     arduino
 
