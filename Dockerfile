@@ -1,36 +1,19 @@
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 
 ENV HOME /home/developer
 WORKDIR /home/developer
 
-# Replace 1000 with your user / group id
-RUN export uid=1000 gid=1000 && \
-    mkdir -p /home/developer && \
-    mkdir -p /etc/sudoers.d && \
-    echo "developer:x:${uid}:${gid}:Developer,,,:/home/developer:/bin/bash" >> /etc/passwd && \
-    echo "developer:x:${uid}:" >> /etc/group && \
-    echo "developer ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/developer && \
-    chmod 0440 /etc/sudoers.d/developer && \
-    chown ${uid}:${gid} -R /home/developer && \
-    apt-get update \
-	&& apt-get install -y \
-        software-properties-common \
-		wget \
-		openjdk-9-jre \
-		xvfb \
-        xz-utils \
-	sudo \
-    && add-apt-repository ppa:ubuntuhandbook1/apps \
-    && apt-get update \
-    && apt-get install -y avrdude avrdude-doc \
-	&& apt-get clean \
-	&& rm -rf /var/lib/apt/lists/*
+# install dependencies
+RUN apt-get update && \ 
+    apt-get install -y \
+      wget \
+      openjdk-17-jre \
+      xz-utils && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Add developer user to the dialout group to be ale to write the serial USB device
-RUN sed "s/^dialout.*/&developer/" /etc/group -i \
-    && sed "s/^root.*/&developer/" /etc/group -i
-
-ENV ARDUINO_IDE_VERSION 1.8.5
+# install arduino ide
+ENV ARDUINO_IDE_VERSION 1.8.19
 RUN (wget -q -O- https://downloads.arduino.cc/arduino-${ARDUINO_IDE_VERSION}-linux64.tar.xz \
 	| tar xJC /usr/local/share \
 	&& ln -s /usr/local/share/arduino-${ARDUINO_IDE_VERSION} /usr/local/share/arduino \
@@ -38,4 +21,10 @@ RUN (wget -q -O- https://downloads.arduino.cc/arduino-${ARDUINO_IDE_VERSION}-lin
 
 ENV DISPLAY :1.0
 
+# create container user
+# replace 1000 with your user / group id
+RUN export uid=1000 gid=1000 && \
+    groupadd -g ${gid} developer && \
+    useradd developer -u ${uid} -g ${gid} -m -s /bin/bash && \
+    usermod -a -G dialout developer
 USER developer
