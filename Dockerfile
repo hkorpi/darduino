@@ -4,7 +4,7 @@ ARG UID=1000
 ARG GID=1000
 ARG ARDUINO_IDE_VERSION=2.2.1
 
-ENV HOME /home/developer
+ENV HOME=/home/developer
 WORKDIR /home/developer
 
 # install dependencies
@@ -17,7 +17,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # install arduino ide
-ENV ARDUINO_IDE_VERSION $ARDUINO_IDE_VERSION
+ENV ARDUINO_IDE_VERSION=$ARDUINO_IDE_VERSION
 RUN cd /opt \
       && wget -q "https://downloads.arduino.cc/arduino-ide/arduino-ide_${ARDUINO_IDE_VERSION}_Linux_64bit.zip" \
       && unzip "arduino-ide_${ARDUINO_IDE_VERSION}_Linux_64bit.zip" \
